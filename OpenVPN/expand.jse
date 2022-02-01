@@ -1,0 +1,54 @@
+/* Expand variables in configuration files */
+
+var forReading = 1;
+var forWriting = 2;
+var args = WScript.Arguments;
+
+if (args.length == 0) {
+  WScript.Echo ("No file specified");
+  WScript.Quit (1);
+}
+
+if (args.length % 2 == 0) {
+  WScript.Echo ("Invalid variable list");
+  WScript.Quit (1);
+}
+
+if (args.length == 1) WScript.Quit (0);
+
+var file = args.Item(0);
+var vars = [];
+
+for (var i = 1; i < args.length; i += 2) {
+  vars.push ([args.Item(i), args.Item(i+1)]);
+}
+
+var fso = WScript.CreateObject ("Scripting.FileSystemObject");
+var fileOld = fso.OpenTextFile (file, forReading);
+var fileNew = fso.CreateTextFile (file + ".tmp");
+
+function replaceAll (str, subj, repl) {
+  while (str.indexOf (subj) != -1) {
+    str = str.replace (subj, repl);
+  }
+  return str;
+}
+
+do {
+  var line = fileOld.ReadLine();
+  for (var i = 0; i < vars.length; ++i) {
+    var variable = vars[i][0];
+    var value = vars[i][1];
+    line = replaceAll (line, variable, value);
+  }
+  fileNew.WriteLine (line);
+} while (!fileOld.AtEndOfStream);
+
+fileOld.Close();
+fileNew.Close();
+
+fileOld = fso.GetFile (file);
+fileOld.Delete (true);
+
+fileNew = fso.GetFile (file + ".tmp");
+fileNew.Move (file);

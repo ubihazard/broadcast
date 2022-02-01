@@ -1,0 +1,11 @@
+@echo off
+cd /d "%~dp0"
+
+:: Revert changes to network interface metric values
+::..\..\broadcast.exe -i "$interface$"
+
+:: Stop BROADcast
+::taskkill.exe /f /im broadcast.exe
+
+:: Stop BROADcast running as a service
+net stop broadcast

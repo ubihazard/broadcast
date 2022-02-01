@@ -1,0 +1,21 @@
+client
+proto udp
+
+dev tap
+dev-node "$interface$"
+
+remote $remote$ $port$
+resolv-retry infinite
+nobind
+
+ca "$path$\\Client\\ca.crt"
+cert "$path$\\Client\\Client.crt"
+key "$path$\\Client\\Client.key"
+
+# You don't need this, unless Client is the one
+# who is hosting the game server, or Client
+# uses certain software which communicates
+# back via broadcast packets too (chat)
+#script-security 2
+#up "$path$\\scripts\\on.bat"
+#down "$path$\\scripts\\off.bat"

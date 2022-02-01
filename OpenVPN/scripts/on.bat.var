@@ -1,0 +1,18 @@
+@echo off
+cd /d "%~dp0"
+
+:: Use BROADcast to make $interface$ a preferred route (lowest metric)
+::..\..\broadcast.exe -i "$interface$" -m
+
+:: Or use BROADcast in UDP relay mode (cleaner way).
+:: OpenVPN must be run with administrator privileges.
+::cscript.exe //E:JScript //NoLogo //B on.jse
+
+:: Same as above, but start BROADcast as a service (needs to be installed).
+:: Use `install.bat` to install BROADcast as a Windows service.
+::
+:: You can continue running OpenVPN without administrator privileges
+:: by manually issuing this command in a separate administrator
+:: command prompt or by using Windows Services management tool:
+:: Win+R -> `services.msc` -> OK -> find BROADcast -> Start.
+net start broadcast

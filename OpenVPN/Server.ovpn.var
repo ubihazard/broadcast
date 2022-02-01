@@ -1,0 +1,20 @@
+local $local$
+port $port$
+proto udp
+
+dev tap
+dev-node "$interface$"
+
+ca "$path$\\Server\\ca.crt"
+cert "$path$\\Server\\Server.crt"
+key "$path$\\Server\\Server.key"
+dh "$path$\\Server\\dh.pem"
+
+server 192.168.180.0 255.255.255.0
+keepalive 10 60
+max-clients 1
+client-config-dir "$path$\\static"
+
+script-security 2
+up "$path$\\scripts\\on.bat"
+down "$path$\\scripts\\off.bat"
