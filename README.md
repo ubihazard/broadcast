@@ -29,7 +29,7 @@ Naturally, the only way to solve this problem in Windows is to bridge both netwo
 
 BROADcast solves this problem nicely by capturing global UDP broadcast packets delivered to the primary (also called “preferred” route) and simply relaying them to all other suitable network interfaces which Windows decided to just pass by.
 
-[BROADcast relays UDP packets](/screenshot.png)
+![BROADcast relays UDP packets](/screenshot.png)
 
 On the screenshot above BROADcast is capturing global UDP broadcast packets delivered to `10.10.10.100` real LAN address (being also the preferred route) and is relaying them to VPN address `100.100.100.1`. Without BROADcast running, packets would’ve remained delivered only to `10.10.10.100`, ignoring completely the VPN segment of the network.
 
