@@ -590,6 +590,9 @@ static void broadcast_start (void)
     wprintf (APP_TITLE L" " APP_VERSION);
     set_text_color (7);
     wprintf (L" is ready.\n");
+    set_text_color (6);
+    _putws (L"https://buymeacoff.ee/ubihazard\n");
+    set_text_color (7);
   }
   service_status = SERVICE_RUNNING;
   svc_report (SERVICE_RUNNING, NO_ERROR, 0);
