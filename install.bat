@@ -14,10 +14,10 @@ set lnkpath=%lnkpath:\=\\%
 set jsepath=%TEMP%\broadcast%RANDOM%%RANDOM%%RANDOM%.jse
 echo var shell = WScript.CreateObject("WScript.Shell"); > "%jsepath%"
 echo var lnk = shell.CreateShortcut("%lnkpath%"); >> "%jsepath%"
-echo lnk.TargetPath = "%lnkhome%\\BROADcast.bat"; >> "%jsepath%"
+echo lnk.TargetPath = "%lnkhome%\\broadcast.bat"; >> "%jsepath%"
 echo lnk.WorkingDirectory = "%lnkhome%"; >> "%jsepath%"
 echo lnk.Description = "BROADcast"; >> "%jsepath%"
-echo lnk.IconLocation = "%lnkhome%\\BROADcast.exe"; >> "%jsepath%"
+echo lnk.IconLocation = "%lnkhome%\\broadcast.exe"; >> "%jsepath%"
 echo lnk.Save(); >> "%jsepath%"
 cscript.exe //E:JScript //NoLogo //B "%jsepath%"
 del /q /f "%jsepath%"
