@@ -89,7 +89,7 @@ Because of this it is highly recommended to start BROADcast separately as a Wind
 
 ### ForceBindIP
 
-While not directly related to BROADcast or UDP broadcast at all, another useful Windows networking crutch is [ForceBindIP](http://r1ch.net/).
+While not directly related to BROADcast or UDP broadcast at all, another useful Windows networking crutch is [ForceBindIP](https://r1ch.net/projects/forcebindip).
 
 Unlike BROADcast, which provides a fix for UDP protocol, ForceBindIP provides a similar fix for TCP protocol by forcing an application to bind (or listen) on a particular network interface instead of the one it automatically chooses (which is often not the one that you want).
 
