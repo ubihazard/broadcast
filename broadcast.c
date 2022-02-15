@@ -1,24 +1,21 @@
 /* =============================================================================
 // BROADcast
 //
-// Force IPv4 UDP broadcast on all network interfaces in Windows 7 and later.
+// Force IPv4 UDP broadcast on all network interfaces on Windows 7 and later.
 //
 // https://buymeacoff.ee/ubihazard
 // -------------------------------------------------------------------------- */
 
-#ifndef _WIN32_WINNT
-/* Enable Windows 7 features */
-#define _WIN32_WINNT 0x0601
-#endif
-
 #ifndef UNICODE
-/* Enable Unicode in WinAPI */
 #define UNICODE
 #endif
 
 #ifndef _UNICODE
-/* Enable Unicode in C runtime */
 #define _UNICODE
+#endif
+
+#ifndef _WIN32_WINNT
+#define _WIN32_WINNT 0x0601
 #endif
 
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
@@ -30,15 +27,20 @@
 #include <Iphlpapi.h>
 #include <shlwapi.h>
 #include <stdlib.h>
+#include <stddef.h>
 #include <signal.h>
 #include <wchar.h>
+
+/* -------------------------------------------------------------------------- */
+
+#define numof(carr) (sizeof(carr) / sizeof(carr[0]))
 
 /* -------------------------------------------------------------------------- */
 
 #define APP_TITLE L"BROADcast"
 #define APP_VERSION L"1.1"
 
-#if (BUF_SIZE == 0)
+#if BUF_SIZE == 0
 /* Sizes less than around 512 bytes would likely result
 // in data fragmentation and won't be broadcast properly.
 // 65535 bytes is guaranteed to work always. */
@@ -60,10 +62,6 @@
 #define UDP_HEADER_SIZE 8
 #define UDP_LENGTH_POS 4
 #define UDP_CHECKSUM_POS 6
-
-/* -------------------------------------------------------------------------- */
-
-#define numof(carr) (sizeof(carr) / sizeof(carr[0]))
 
 /* -------------------------------------------------------------------------- */
 
@@ -316,7 +314,7 @@ next_packet:
       continue;
     }
 
-#ifdef DEBUG
+#ifndef NDEBUG
     wprintf (L"[DEBUG] Source address: %.8X\n", (unsigned)ntohl(*(ULONG*)(buf + IP_ADDR_SRC_POS)));
     wprintf (L"[DEBUG] Destination address: %.8X\n", (unsigned)ntohl(*(ULONG*)(buf + IP_ADDR_DST_POS)));
     wprintf (L"[DEBUG] Source port: %u\n", (unsigned)ntohs(*(WORD*)(buf + IP_HEADER_SIZE)));
