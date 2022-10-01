@@ -33,10 +33,6 @@
 
 /* -------------------------------------------------------------------------- */
 
-#define numof(carr) (sizeof(carr) / sizeof(carr[0]))
-
-/* -------------------------------------------------------------------------- */
-
 #define APP_TITLE L"BROADcast"
 #define APP_VERSION L"1.1"
 
@@ -47,7 +43,7 @@
 #define BUF_SIZE 65535
 #endif
 
-#if (BUF_SIZE < 256 || BUF_SIZE > 0x10000)
+#if BUF_SIZE < 256 || BUF_SIZE > 0x10000
 #error "Invalid definition of `BUF_SIZE`"
 #endif
 
@@ -62,6 +58,10 @@
 #define UDP_HEADER_SIZE 8
 #define UDP_LENGTH_POS 4
 #define UDP_CHECKSUM_POS 6
+
+/* -------------------------------------------------------------------------- */
+
+#define numof(carr) (sizeof(carr) / sizeof(carr[0]))
 
 /* -------------------------------------------------------------------------- */
 
@@ -140,7 +140,7 @@ static int metric_update (const wchar_t* const iface, BOOL const manual)
   ULONG metric = 0;
 
   /* Obtain the list of Ethernet & Wi-Fi adapters */
-  PIP_ADAPTER_ADDRESSES addresses = NULL, runner;
+  PIP_ADAPTER_ADDRESSES addresses = NULL, r;
   DWORD addresses_sz = 0, tries = 0, result;
 
   do {
@@ -170,23 +170,23 @@ static int metric_update (const wchar_t* const iface, BOOL const manual)
 
   /* Look up the requested network interface */
   if (manual) {
-    runner = addresses;
+    r = addresses;
 
-    while (runner != NULL)
+    while (r != NULL)
     {
-      if ((runner->IfType != IF_TYPE_ETHERNET_CSMACD)
-      &&  (runner->IfType != IF_TYPE_IEEE80211)) {
-        runner = runner->Next;
+      if ((r->IfType != IF_TYPE_ETHERNET_CSMACD)
+      &&  (r->IfType != IF_TYPE_IEEE80211)) {
+        r = r->Next;
         continue;
       }
 
-      if (_wcsicmp (iface, runner->FriendlyName) == 0) {
+      if (_wcsicmp (iface, r->FriendlyName) == 0) {
         /* Remember old metric */
-        metric = runner->Ipv4Metric;
+        metric = r->Ipv4Metric;
         break;
       }
 
-      runner = runner->Next;
+      r = r->Next;
     }
 
     /* Couldn't find */
@@ -197,24 +197,24 @@ static int metric_update (const wchar_t* const iface, BOOL const manual)
   }
 
   /* Update metric values */
-  runner = addresses;
+  r = addresses;
 
-  while (runner != NULL) {
-    if ((runner->IfType != IF_TYPE_ETHERNET_CSMACD)
-    &&  (runner->IfType != IF_TYPE_IEEE80211)) {
-      runner = runner->Next;
+  while (r != NULL) {
+    if ((r->IfType != IF_TYPE_ETHERNET_CSMACD)
+    &&  (r->IfType != IF_TYPE_IEEE80211)) {
+      r = r->Next;
       continue;
     }
 
-    if (_wcsicmp (iface, runner->FriendlyName) != 0) {
+    if (_wcsicmp (iface, r->FriendlyName) != 0) {
       MIB_IPINTERFACE_ROW iface_row;
       InitializeIpInterfaceEntry (&iface_row);
-      iface_row.InterfaceLuid = runner->Luid;
+      iface_row.InterfaceLuid = r->Luid;
       iface_row.Family = AF_INET;
 
       if (manual) {
         iface_row.UseAutomaticMetric = FALSE;
-        iface_row.Metric = runner->Ipv4Metric + metric;
+        iface_row.Metric = r->Ipv4Metric + metric;
       } else {
         iface_row.UseAutomaticMetric = TRUE;
       }
@@ -222,7 +222,7 @@ static int metric_update (const wchar_t* const iface, BOOL const manual)
       SetIpInterfaceEntry (&iface_row);
     }
 
-    runner = runner->Next;
+    r = r->Next;
   }
 
   free (addresses);
@@ -231,9 +231,11 @@ static int metric_update (const wchar_t* const iface, BOOL const manual)
 
 /* -------------------------------------------------------------------------- */
 
-BOOL already_stopped;
+static void svc_report (DWORD, DWORD, DWORD);
 
-static void signal_handler (int signum)
+static BOOL already_stopped;
+
+static void signal_handler (int const signum)
 {
   if (already_stopped) return;
   already_stopped = TRUE;
@@ -519,8 +521,6 @@ done:
   HeapFree (GetProcessHeap(), 0, fwd_table);
 }
 
-static void svc_report (DWORD, DWORD, DWORD);
-
 static void broadcast_start (void)
 {
   /* Initialize Winsock */
@@ -606,27 +606,8 @@ static void broadcast_start (void)
 
 /* -------------------------------------------------------------------------- */
 
-static BOOL is_admin (void)
-{
-  BOOL ret = FALSE;
-  HANDLE token = NULL;
-  if (OpenProcessToken (GetCurrentProcess(), TOKEN_QUERY, &token)) {
-    TOKEN_ELEVATION elev;
-    DWORD size = sizeof(TOKEN_ELEVATION);
-    if (GetTokenInformation (token, TokenElevation, &elev, sizeof(elev), &size)) {
-      ret = elev.TokenIsElevated;
-    }
-  }
-  if (token != NULL) {
-    CloseHandle (token);
-  }
-  return ret;
-}
-
-/* -------------------------------------------------------------------------- */
-
-SERVICE_STATUS        svc_status;
-SERVICE_STATUS_HANDLE svc_status_hndl;
+static SERVICE_STATUS        svc_status;
+static SERVICE_STATUS_HANDLE svc_status_hndl;
 
 static BOOL svc_install (void)
 {
@@ -722,6 +703,25 @@ static void WINAPI svc_main (DWORD const argc, LPWSTR* const argv)
   broadcast_start();
   service_status = SERVICE_STOPPED;
   svc_report (SERVICE_STOPPED, fail ? EXIT_FAILURE : EXIT_SUCCESS, 0);
+}
+
+/* -------------------------------------------------------------------------- */
+
+static BOOL is_admin (void)
+{
+  BOOL ret = FALSE;
+  HANDLE token = NULL;
+  if (OpenProcessToken (GetCurrentProcess(), TOKEN_QUERY, &token)) {
+    TOKEN_ELEVATION elev;
+    DWORD size = sizeof(TOKEN_ELEVATION);
+    if (GetTokenInformation (token, TokenElevation, &elev, sizeof(elev), &size)) {
+      ret = elev.TokenIsElevated;
+    }
+  }
+  if (token != NULL) {
+    CloseHandle (token);
+  }
+  return ret;
 }
 
 /* ========================================================================== */

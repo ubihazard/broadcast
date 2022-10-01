@@ -55,7 +55,7 @@ broadcast.exe -b -d
 
 Broadcast packets would be delivered to all network interfaces except the default one. Use <kbd>Ctrl+C</kbd> to exit BROADcast cleanly.
 
-As a bonus feature BROADcast allows to make any interface the default (or preferred). It does so by taking the current metric value of the interface you desire to turn into default and adding it to each other interface metric value, making it the lowest metric value of all:
+As a bonus feature, BROADcast allows to make any interface the default (or preferred) one. It does so by taking the current metric value of the interface you desire to turn into default and adding it to each other interface metric value, making it the lowest metric value of all:
 
 ```bat
 BROADcast.exe -i "Interface" -m
@@ -81,7 +81,7 @@ broadcast.exe [install | uninstall]
 
 ### OpenVPN
 
-BROADcast repository contains an example OpenVPN configuration and scripts for running BROADcast after starting a OpenVPN server using a TAP device.
+BROADcast repository contains an example OpenVPN configuration and scripts for running BROADcast after starting an OpenVPN server using a TAP device.
 
 *Note that if you intend to start BROADcast from OpenVPN using its start/stop script functionality, you must also run OpenVPN with administrator privileges, just like BROADcast.*
 
@@ -93,6 +93,6 @@ While not directly related to BROADcast or UDP broadcast at all, another useful 
 
 Unlike BROADcast, which provides a fix for UDP protocol, ForceBindIP provides a similar fix for TCP protocol by forcing an application to bind (or listen) on a particular network interface instead of the one it automatically chooses (which is often not the one that you want).
 
-## Support
+## ⭐ Support
 
-If you find [BROADcast](https://github.com/ubihazard/broadcast) useful, you can [buy me a ☕](https://www.buymeacoffee.com/ubihazard "Show support")!
+Making quality software is hard and time-consuming. If you find [BROADcast](https://github.com/ubihazard/broadcast) useful, you can [buy me a ☕](https://www.buymeacoffee.com/ubihazard "Donate")!
